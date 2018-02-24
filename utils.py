@@ -8,7 +8,7 @@ Created on Sat Feb 24 09:30:40 2018
 #Original passes if string len%16 == 0 (i.e. no padding is needed)
 #3_17 version passes only if padding exists AND is valid
 
-def validate_pkcs7_3_17(b_inp_pt, block_size=16):
+def validate_pkcs7(b_inp_pt, block_size=16):
     ln = len(b_inp_pt)
     last_block = b_inp_pt[ln-block_size:]
     assert len(last_block) == block_size
