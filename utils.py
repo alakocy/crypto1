@@ -249,6 +249,40 @@ def decrypt_CBC(b_c_inp, b_key, b_iv):
         b_p_mess += b_out_block
     return b_p_mess
 
+def endecrypt_CTR(b_p_inp, b_key, b_nonce, ctr_start):
+    b_xor_pad = b""
+    ctr = ctr_start
+    
+    def up_ctr(ctr):
+        b_ctr = b""
+        while ctr > 256:
+            b_ctr += bytes([ctr%256])
+            ctr = ctr//256
+        b_ctr += bytes([ctr])
+        b_ctr += bytes([0]*(8-len(b_ctr)))
+        return b_ctr
+    
+    def encrypt_block(b_p_block, b_key):
+        assert len(b_p_block) == 16 
+        b_block_out = encrypt_AES(b_p_block, b_key, AES.MODE_ECB)
+        return b_block_out
+    
+    assert up_ctr(2497653654) == b"\x96+\xdf\x94\x00\x00\x00\x00"
+    
+    while len(b_xor_pad) < len(b_p_inp):
+        b_ctr = up_ctr(ctr)
+        b_xor_block = encrypt_block(b_nonce+b_ctr, b_key)
+        b_xor_pad += b_xor_block
+        ctr += 1
+    
+    b_xor_pad = b_xor_pad[:len(b_p_inp)]
+    
+    return onetimepad_xor(b_xor_pad, b_p_inp)
+    
+    
+    
+
+
 def random_AES_key(keysize = 16):
     key = b""
     for i in range(keysize):
